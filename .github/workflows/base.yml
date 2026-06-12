@@ -17,8 +17,13 @@ jobs:
           extensions: mbstring, xml, ctype, json, curl, dom
           coverage: none
 
-      - uses: ramsey/composer-install@v3
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH_TOKEN }}"}}'
 
-      - run: composer test:lint
+      - name: Run Pint
+        run: composer test:lint
 
-      - run: composer test:stan
+      - name: Run PHPStan
+        run: composer test:stan
