@@ -82,7 +82,7 @@ The package is organized around **3 patterns** that recur in every AWS integrati
 
 This separation means the consumer service writes the handler code once, and it runs identically in production (Lambda), local dev (CLI), and tests (in-process).
 
-See [docs/architecture.md](docs/architecture.md) for the full design.
+See [docs/architecture.md](docs/architecture.md) for the full design. The AWS resources this package talks to (EventBridge bus, SQS queues, IAM roles, SSM parameters) are owned by [`veritypos-infrastructure`](https://github.com/VerityCodeLabs-Group/veritypos-infrastructure) — see [docs/infrastructure-requirements.md](docs/infrastructure-requirements.md) for the resource → module map.
 
 ## Environment variables
 
