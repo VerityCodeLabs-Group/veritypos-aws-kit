@@ -32,7 +32,7 @@ it('rejects batch entries exceeding the SQS 10-entry hard limit', function (): v
     $batch = array_fill(0, 11, ['messageBody' => '{}']);
 
     $publisher->publishBatch($batch);
-})->throws(\InvalidArgumentException::class, 'SQS sendMessageBatch accepts at most 10 entries per call');
+})->throws(InvalidArgumentException::class, 'SQS sendMessageBatch accepts at most 10 entries per call');
 
 it('treats an empty batch as a no-op (does not call sendMessageBatch)', function (): void {
     // We can't easily verify "sendMessageBatch was not called" without a

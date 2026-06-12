@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Aws\AwsClient;
 use VerityPOS\AwsKit\Aws\ClientFactory;
 
 it('builds a client for an arbitrary AWS service', function (): void {
@@ -23,7 +24,7 @@ it('applies a custom endpoint (LocalStack)', function (): void {
     $factory = new ClientFactory;
     $client = $factory->build('sqs', 'ap-southeast-1', 'http://localhost:4566');
 
-    expect($client)->toBeInstanceOf(\Aws\AwsClient::class);
+    expect($client)->toBeInstanceOf(AwsClient::class);
 });
 
 it('uses default credential chain when no creds and no endpoint', function (): void {
@@ -32,5 +33,5 @@ it('uses default credential chain when no creds and no endpoint', function (): v
 
     // The SDK will fall back to the default credential provider chain
     // (env, role, etc.). We can only verify the client builds.
-    expect($client)->toBeInstanceOf(\Aws\AwsClient::class);
+    expect($client)->toBeInstanceOf(AwsClient::class);
 });

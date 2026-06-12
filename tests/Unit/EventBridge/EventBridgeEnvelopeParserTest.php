@@ -37,12 +37,12 @@ it('parses a valid EventBridge envelope from an array', function (): void {
 it('rejects an envelope missing the source field', function (): void {
     $parser = new EventBridgeEnvelopeParser;
     $parser->fromArray(['detail-type' => 'user.created', 'detail' => []]);
-})->throws(\InvalidArgumentException::class, 'EventBridge envelope missing source or detail-type');
+})->throws(InvalidArgumentException::class, 'EventBridge envelope missing source or detail-type');
 
 it('rejects an envelope missing the detail-type field', function (): void {
     $parser = new EventBridgeEnvelopeParser;
     $parser->fromArray(['source' => 'veritypos.auth', 'detail' => []]);
-})->throws(\InvalidArgumentException::class, 'EventBridge envelope missing source or detail-type');
+})->throws(InvalidArgumentException::class, 'EventBridge envelope missing source or detail-type');
 
 it('rejects an envelope where detail is not an array', function (): void {
     $parser = new EventBridgeEnvelopeParser;
@@ -51,9 +51,9 @@ it('rejects an envelope where detail is not an array', function (): void {
         'detail-type' => 'user.created',
         'detail' => 'not-an-object',
     ]);
-})->throws(\InvalidArgumentException::class, 'EventBridge envelope `detail` must be an array');
+})->throws(InvalidArgumentException::class, 'EventBridge envelope `detail` must be an array');
 
 it('rejects a non-array JSON payload', function (): void {
     $parser = new EventBridgeEnvelopeParser;
     $parser->parse('"just-a-string"');
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);

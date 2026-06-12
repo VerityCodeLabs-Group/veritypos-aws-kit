@@ -41,8 +41,8 @@ final class EventBridgePublisher
     /**
      * Publish a domain event.
      *
-     * @param  string         $source     the service source (e.g. "auth", "platform")
-     * @param  string         $eventType  the event type (e.g. "user.created")
+     * @param  string  $source  the service source (e.g. "auth", "platform")
+     * @param  string  $eventType  the event type (e.g. "user.created")
      * @param  array<string, mixed>  $detail
      *
      * @throws Throwable on AWS SDK error

@@ -28,10 +28,8 @@ use VerityPOS\AwsKit\Contracts\Envelope;
 final class SqsEnvelope implements Envelope
 {
     /**
-     * @param  array<string, mixed>                              $payload
+     * @param  array<string, mixed>  $payload
      * @param  array<string, array{DataType: string, StringValue: string}>  $attributes
-     * @param  string|null                                        $messageId
-     * @param  string|null                                        $receiptHandle
      */
     public function __construct(
         private readonly string $source,

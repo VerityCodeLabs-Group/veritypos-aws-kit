@@ -20,9 +20,7 @@ use InvalidArgumentException;
 final class SqsClientFactory
 {
     /**
-     * @param  string                $queueUrl
-     * @param  string                $region
-     * @param  string|null           $endpoint  null in prod; LocalStack URL in dev
+     * @param  string|null  $endpoint  null in prod; LocalStack URL in dev
      * @param  array{key: string, secret: string}|null  $credentials
      */
     public function create(

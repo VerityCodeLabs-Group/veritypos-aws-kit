@@ -72,7 +72,7 @@ it('rejects a body that is not a JSON object', function (): void {
         'Body' => '"just-a-string"',
         'MessageAttributes' => [],
     ], 'queue-url');
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 it('rejects a message without event_type anywhere', function (): void {
     $parser = new SqsEnvelopeParser;
@@ -80,4 +80,4 @@ it('rejects a message without event_type anywhere', function (): void {
         'Body' => json_encode(['id' => '1']),
         'MessageAttributes' => [],
     ], 'queue-url');
-})->throws(\InvalidArgumentException::class, 'SQS message missing event_type attribute');
+})->throws(InvalidArgumentException::class, 'SQS message missing event_type attribute');
