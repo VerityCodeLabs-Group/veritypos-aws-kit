@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.2.0...v0.3.0) (2026-06-12)
+
+
+### Features
+
+* bootstrap veritypos/aws-kit package ([7f1a19e](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/7f1a19e66f12e733a56a2f863564c162a07ed529))
+* **sqs:** add SQS publisher + Fargate consumer (v0.2.0) ([c1b9f7e](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/c1b9f7eebc0d924fa4da37278673e62e4ef666eb))
+
 ## [2.5.0](https://github.com/VerityCodeLabs-Group/veritypos-auth-sdk-php/compare/v2.4.0...v2.5.0) (2026-05-14)
 
 
