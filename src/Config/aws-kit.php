@@ -18,4 +18,13 @@ return [
         'region' => env('AWS_REGION', 'ap-southeast-1'),
         'endpoint' => env('EVENTBRIDGE_ENDPOINT'),
     ],
+
+    'sqs' => [
+        'consumer' => [
+            // Queue URL for the aws-kit:sqs-consume command. Read by
+            // default; --queue= on the CLI overrides this. Set in the
+            // consumer service's published config/aws-kit.php.
+            'queue_url' => env('AWS_KIT_SQS_CONSUMER_QUEUE_URL'),
+        ],
+    ],
 ];
