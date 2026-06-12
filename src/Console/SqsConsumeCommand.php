@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace VerityPOS\AwsKit\Console;
 
 use Illuminate\Console\Command;
-use Throwable;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
 use VerityPOS\AwsKit\Contracts\Envelope;
 use VerityPOS\AwsKit\Sqs\Consumer;
 use VerityPOS\AwsKit\Sqs\ConsumerConfig;
-use VerityPOS\AwsKit\Sqs\SqsEnvelopeParser;
 
 /**
  * Long-poll SQS consumer worker.
