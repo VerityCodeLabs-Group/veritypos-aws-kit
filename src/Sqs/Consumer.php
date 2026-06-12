@@ -60,6 +60,21 @@ final class Consumer implements ConsumerContract
         } while (! $this->shouldStop);
     }
 
+    /**
+     * Run exactly one poll and return. Used by the --once flag on
+     * the SqsConsumeCommand for tests + one-shot debugging.
+     *
+     * @param  callable(Envelope): void  $handler
+     */
+    public function consumeOnce(callable $handler): void
+    {
+        if (! $this->isConfigured()) {
+            throw new \LogicException('Consumer is not configured (queueUrl is empty)');
+        }
+
+        $this->pollOnce($handler);
+    }
+
     public function stop(): void
     {
         $this->shouldStop = true;

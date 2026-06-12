@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VerityPOS\AwsKit\Console;
 
 use Illuminate\Console\Command;
+use RuntimeException;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
 use VerityPOS\AwsKit\Contracts\Envelope;
 use VerityPOS\AwsKit\Sqs\Consumer;
@@ -17,7 +18,11 @@ use VerityPOS\AwsKit\Sqs\ConsumerConfig;
  * runs one of these per consumed queue:
  *
  *   [program:aws-kit-sqs-consume]
- *   command=php /var/www/artisan aws-kit:sqs-consume --queue=%(ENV_SQS_QUEUE_URL)s
+ *   command=php /var/www/artisan aws-kit:sqs-consume --max-messages=10
+ *
+ * The queue URL is read from `config('aws-kit.sqs.consumer.queue_url')`
+ * by default, with `--queue=` as a per-invocation override. This
+ * makes the command service-agnostic — no per-service wrapper needed.
  *
  * The worker:
  *   1. Long-polls SQS for messages
@@ -34,12 +39,12 @@ final class SqsConsumeCommand extends Command
 {
     /** @var string */
     protected $signature = 'aws-kit:sqs-consume
-        {--queue= : The SQS queue URL to consume from (required)}
+        {--queue= : The SQS queue URL (default: config aws-kit.sqs.consumer.queue_url)}
         {--max-messages=10 : Max messages to receive per poll (max 10)}
         {--wait-time=20 : Long-poll wait time in seconds (max 20)}
-        {--visibility-timeout=30 : Visibility timeout in seconds}
-        {--region= : AWS region (default: AWS_REGION env or ap-southeast-1)}
-        {--endpoint= : Override endpoint (for LocalStack)}
+        {--visibility-timeout=30 : Message visibility timeout in seconds}
+        {--region= : AWS region (default: aws-kit.aws.region or ap-southeast-1)}
+        {--endpoint= : Override endpoint (for LocalStack; default: aws-kit.aws.endpoint)}
         {--once : Process one batch and exit (used for tests)}';
 
     /** @var string */
@@ -55,12 +60,15 @@ final class SqsConsumeCommand extends Command
     public function handle(): int
     {
         $queueOption = $this->option('queue');
-        $queueUrl = is_string($queueOption) ? $queueOption : '';
+        $queueUrl = is_string($queueOption) && $queueOption !== ''
+            ? $queueOption
+            : (string) config('aws-kit.sqs.consumer.queue_url', '');
 
         if ($queueUrl === '') {
-            $this->error('--queue is required.');
-
-            return self::FAILURE;
+            throw new RuntimeException(
+                'SQS queue URL is not configured. Set config(\'aws-kit.sqs.consumer.queue_url\') '
+                .'or pass --queue=<url> on the command line.'
+            );
         }
 
         $config = new ConsumerConfig(
@@ -77,16 +85,16 @@ final class SqsConsumeCommand extends Command
 
         $this->consumer->registerSignalHandlers();
 
-        // One batch mode is for tests / debugging
+        // --once runs a single poll, then exits. Used by tests and
+        // for one-shot debugging sessions. The full supervisord path
+        // runs without --once (long-lived).
         if ($this->option('once')) {
-            $this->consumer->consume(fn ($envelope) => $this->dispatch($envelope));
+            $this->consumer->consumeOnce(fn (Envelope $envelope) => $this->dispatch($envelope));
 
             return self::SUCCESS;
         }
 
-        $this->consumer->consume(function ($envelope): void {
-            $this->dispatch($envelope);
-        });
+        $this->consumer->consume(fn (Envelope $envelope) => $this->dispatch($envelope));
 
         return self::SUCCESS;
     }
