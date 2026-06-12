@@ -7,6 +7,7 @@ namespace VerityPOS\AwsKit\Providers;
 use Illuminate\Support\ServiceProvider;
 use VerityPOS\AwsKit\Console\EventBridgeInvokeCommand;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
+use VerityPOS\AwsKit\Dispatcher\NullDispatcher;
 use VerityPOS\AwsKit\EventBridge\EventBridgePublisher;
 
 /**
@@ -34,11 +35,13 @@ final class AwsKitServiceProvider extends ServiceProvider
             );
         });
 
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                EventBridgeInvokeCommand::class,
-            ]);
+        if (! $this->app->runningInConsole()) {
+            return;
         }
+
+        $this->commands([
+            EventBridgeInvokeCommand::class,
+        ]);
     }
 
     /**
@@ -52,17 +55,12 @@ final class AwsKitServiceProvider extends ServiceProvider
         ], 'aws-kit-config');
 
         // If the consumer service has a Dispatcher bound, leave it alone.
-        // Otherwise bind a default no-op dispatcher (so the package
-        // doesn't require a consumer service to register one).
-        if (! $this->app->bound(Dispatcher::class)) {
-            $this->app->singleton(Dispatcher::class, function () {
-                return new class implements Dispatcher {
-                    public function dispatch(string $eventType, array $payload): void
-                    {
-                        // No-op default. Consumer services override this.
-                    }
-                };
-            });
+        // Otherwise bind a no-op default so the package doesn't require
+        // a consumer service to register one.
+        if ($this->app->bound(Dispatcher::class)) {
+            return;
         }
+
+        $this->app->singleton(Dispatcher::class, NullDispatcher::class);
     }
 }

@@ -42,7 +42,9 @@ final class EventBridgeInvokeCommand extends Command
 
     public function handle(): int
     {
-        $envelope = $this->resolveEnvelope();
+        $envelope = $this->option('event-file') !== null
+            ? $this->resolveFromFile((string) $this->option('event-file'))
+            : $this->resolveFromOptions();
 
         if ($envelope === null) {
             return self::FAILURE;
@@ -69,29 +71,31 @@ final class EventBridgeInvokeCommand extends Command
     /**
      * @return array<string, mixed>|null
      */
-    private function resolveEnvelope(): ?array
+    private function resolveFromFile(string $path): ?array
     {
-        $eventFile = $this->option('event-file');
+        if (! file_exists($path)) {
+            $this->error("Event file not found: {$path}");
 
-        if ($eventFile !== null) {
-            if (! file_exists($eventFile)) {
-                $this->error("Event file not found: {$eventFile}");
-
-                return null;
-            }
-
-            $contents = file_get_contents($eventFile);
-            if ($contents === false) {
-                $this->error("Failed to read event file: {$eventFile}");
-
-                return null;
-            }
-
-            $data = json_decode($contents, true);
-
-            return is_array($data) ? $data : null;
+            return null;
         }
 
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            $this->error("Failed to read event file: {$path}");
+
+            return null;
+        }
+
+        $data = json_decode($contents, true);
+
+        return is_array($data) ? $data : null;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function resolveFromOptions(): ?array
+    {
         $eventType = $this->option('event-type');
         if ($eventType === null) {
             $this->error('Provide --event-type or --event-file.');
@@ -99,26 +103,12 @@ final class EventBridgeInvokeCommand extends Command
             return null;
         }
 
-        $source = (string) $this->option('source');
-        $payload = [];
-
-        $payloadOption = $this->option('payload');
-        if ($payloadOption !== null) {
-            $decoded = json_decode($payloadOption, true);
-
-            if (is_array($decoded)) {
-                $payload = $decoded;
-            } else {
-                $this->error('--payload must be valid JSON.');
-
-                return null;
-            }
-        }
+        $payload = $this->resolvePayload();
 
         return [
             'version' => '0',
             'id' => (string) Str::uuid(),
-            'source' => "veritypos.{$source}",
+            'source' => 'veritypos.'.(string) $this->option('source'),
             'detail-type' => $eventType,
             'account' => '000000000000',
             'time' => now()->toISOString(),
@@ -126,5 +116,25 @@ final class EventBridgeInvokeCommand extends Command
             'resources' => [],
             'detail' => $payload,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolvePayload(): array
+    {
+        $payloadOption = $this->option('payload');
+        if ($payloadOption === null) {
+            return [];
+        }
+
+        $decoded = json_decode($payloadOption, true);
+        if (! is_array($decoded)) {
+            $this->error('--payload must be valid JSON.');
+
+            return [];
+        }
+
+        return $decoded;
     }
 }
