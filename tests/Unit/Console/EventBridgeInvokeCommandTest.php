@@ -2,24 +2,27 @@
 
 declare(strict_types=1);
 
+use Illuminate\Console\Command;
 use VerityPOS\AwsKit\Console\EventBridgeInvokeCommand;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
 use VerityPOS\AwsKit\EventBridge\EventBridgeEnvelopeParser;
 
 it('implements the artisan command contract', function (): void {
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
     $parser = new EventBridgeEnvelopeParser;
 
     $command = new EventBridgeInvokeCommand($dispatcher, $parser);
 
-    expect($command)->toBeInstanceOf(\Illuminate\Console\Command::class)
+    expect($command)->toBeInstanceOf(Command::class)
         ->and($command->getName())->toBe('aws-kit:event-bridge-invoke');
 });
 
 it('declares the expected --event-type and --event-file options', function (): void {
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
     $parser = new EventBridgeEnvelopeParser;
@@ -34,7 +37,8 @@ it('declares the expected --event-type and --event-file options', function (): v
 });
 
 it('the --event-type and --event-file options must accept a value', function (): void {
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
     $parser = new EventBridgeEnvelopeParser;

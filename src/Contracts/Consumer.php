@@ -17,7 +17,7 @@ interface Consumer
      * message; returning true acknowledges the message, false / throwing
      * leaves it for redelivery (or routes to DLQ after the retry budget).
      *
-     * @param  callable(array<string, mixed> $body): bool  $handler
+     * @param  callable(Envelope): void  $handler
      */
     public function consume(callable $handler): void;
 

@@ -54,7 +54,9 @@ final class SqsConsumeCommand extends Command
 
     public function handle(): int
     {
-        $queueUrl = (string) $this->option('queue');
+        $queueOption = $this->option('queue');
+        $queueUrl = is_string($queueOption) ? $queueOption : '';
+
         if ($queueUrl === '') {
             $this->error('--queue is required.');
 

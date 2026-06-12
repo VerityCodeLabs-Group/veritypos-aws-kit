@@ -27,9 +27,8 @@ use Aws\Credentials\Credentials;
 final class ClientFactory
 {
     /**
-     * @param  string                $service  the AWS service identifier (e.g. "eventbridge", "sqs")
-     * @param  string                $region
-     * @param  string|null           $endpoint  null in prod; LocalStack URL in dev
+     * @param  string  $service  the AWS service identifier (e.g. "eventbridge", "sqs")
+     * @param  string|null  $endpoint  null in prod; LocalStack URL in dev
      * @param  array{key: string, secret: string}|null  $credentials
      */
     public function build(

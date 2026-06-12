@@ -8,6 +8,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use VerityPOS\AwsKit\Contracts\Consumer as ConsumerContract;
+use VerityPOS\AwsKit\Contracts\Envelope;
 
 /**
  * Long-poll SQS consumer.
@@ -44,7 +45,7 @@ final class Consumer implements ConsumerContract
     /**
      * Block and consume messages.
      *
-     * @param  callable(\VerityPOS\AwsKit\Contracts\Envelope): void  $handler
+     * @param  callable(Envelope): void  $handler
      */
     public function consume(callable $handler): void
     {
@@ -83,7 +84,7 @@ final class Consumer implements ConsumerContract
     }
 
     /**
-     * @param  callable(\VerityPOS\AwsKit\Contracts\Envelope): void  $handler
+     * @param  callable(Envelope): void  $handler
      */
     private function pollOnce(callable $handler): void
     {
@@ -111,8 +112,8 @@ final class Consumer implements ConsumerContract
     }
 
     /**
-     * @param  array<string, mixed>                                  $message
-     * @param  callable(\VerityPOS\AwsKit\Contracts\Envelope): void  $handler
+     * @param  array<string, mixed>  $message
+     * @param  callable(Envelope): void  $handler
      */
     private function processMessage(array $message, callable $handler): void
     {

@@ -19,7 +19,7 @@ final class SqsEnvelopeParser
 {
     /**
      * @param  array<string, mixed>  $rawMessage  the full SQS message array
-     * @param  string               $source      queue ARN or URL (for routing)
+     * @param  string  $source  queue ARN or URL (for routing)
      */
     public function parse(array $rawMessage, string $source): Envelope
     {
@@ -60,7 +60,7 @@ final class SqsEnvelopeParser
     }
 
     /**
-     * @param  array<string, mixed>                              $payload
+     * @param  array<string, mixed>  $payload
      * @param  array<string, array{DataType: string, StringValue: string}>  $attributes
      */
     private function extractEventType(array $payload, array $attributes): string
@@ -68,8 +68,8 @@ final class SqsEnvelopeParser
         // Preferred: message attribute (cheap to access, doesn't require
         // parsing the body)
         $attr = $attributes['event_type'] ?? null;
-        if (is_array($attr) && isset($attr['StringValue'])) {
-            return (string) $attr['StringValue'];
+        if (is_array($attr)) {
+            return $attr['StringValue'];
         }
 
         // Fallback: detail-type field in the body (parity with EventBridge)

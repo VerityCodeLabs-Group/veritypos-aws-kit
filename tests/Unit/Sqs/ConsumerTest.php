@@ -31,7 +31,7 @@ it('throws if consume is called without a configured queue URL', function (): vo
     );
 
     $consumer->consume(fn () => null);
-})->throws(\LogicException::class, 'Consumer is not configured');
+})->throws(LogicException::class, 'Consumer is not configured');
 
 it('can be stopped (sets the shouldStop flag, no throw)', function (): void {
     $consumer = new Consumer(

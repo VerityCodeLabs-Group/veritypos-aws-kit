@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Console\Command;
 use VerityPOS\AwsKit\Console\SqsConsumeCommand;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
 use VerityPOS\AwsKit\Contracts\Envelope;
@@ -14,13 +15,14 @@ it('implements the artisan command contract', function (): void {
         clientFactory: new SqsClientFactory,
         config: ConsumerConfig::forQueue('q1'),
     );
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
 
     $command = new SqsConsumeCommand($consumer, $dispatcher);
 
-    expect($command)->toBeInstanceOf(\Illuminate\Console\Command::class)
+    expect($command)->toBeInstanceOf(Command::class)
         ->and($command->getName())->toBe('aws-kit:sqs-consume');
 });
 
@@ -29,7 +31,8 @@ it('declares the expected --queue and tuning options', function (): void {
         clientFactory: new SqsClientFactory,
         config: ConsumerConfig::forQueue('q1'),
     );
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
 
@@ -50,7 +53,8 @@ it('requires --queue to be a non-empty string (the option itself)', function ():
         clientFactory: new SqsClientFactory,
         config: ConsumerConfig::forQueue('q1'),
     );
-    $dispatcher = new class implements Dispatcher {
+    $dispatcher = new class implements Dispatcher
+    {
         public function dispatch(string $eventType, array $payload): void {}
     };
 
@@ -62,15 +66,29 @@ it('requires --queue to be a non-empty string (the option itself)', function ():
 });
 
 it('dispatches the unwrapped envelope to the consumer service dispatcher', function (): void {
-    $envelope = new class implements Envelope {
-        public function source(): string { return 'q1'; }
-        public function eventType(): string { return 'user.created'; }
-        public function payload(): array { return ['id' => 'u-1']; }
+    $envelope = new class implements Envelope
+    {
+        public function source(): string
+        {
+            return 'q1';
+        }
+
+        public function eventType(): string
+        {
+            return 'user.created';
+        }
+
+        public function payload(): array
+        {
+            return ['id' => 'u-1'];
+        }
     };
 
     $captured = null;
-    $dispatcher = new class($captured) implements Dispatcher {
+    $dispatcher = new class($captured) implements Dispatcher
+    {
         public mixed $captured = null;
+
         public function dispatch(string $eventType, array $payload): void
         {
             $this->captured = ['type' => $eventType, 'payload' => $payload];
