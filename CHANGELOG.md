@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.3.0...v0.3.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* address 6 pre-existing PHPStan errors + 1 S3 SDK compat issue ([7cb8633](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/7cb8633bcda9658148cdfd047fd5839524d89226))
+
+
+### Miscellaneous Chores
+
+* **ci:** align workflows with internal composer packages (sync-sdk) ([cefdfec](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/cefdfec01ae3d14103bfda79c005559964e06f42))
+* **ci:** align workflows with internal composer packages (sync-sdk) ([55e756c](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/55e756c2696cd78c2aa5161405c4b3aed5944925))
+* **ci:** align workflows with internal composer packages + add contracts VCS ([8957728](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/8957728cf72c40fb56340d864e189bc3a7cfbde7))
+
 ## [0.3.0](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.2.0...v0.3.0) (2026-06-12)
 
 
