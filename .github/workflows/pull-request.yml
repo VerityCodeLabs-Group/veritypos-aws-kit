@@ -7,9 +7,11 @@ on:
 
 jobs:
   ci:
+    name: CI
     uses: ./.github/workflows/base.yml
     secrets: inherit
 
   tests:
+    name: Tests
     uses: ./.github/workflows/run-tests.yml
     secrets: inherit
