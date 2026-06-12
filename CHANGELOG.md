@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.0...v0.4.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* **config:** publish aws-kit.sqs.consumer.queue_url in default config ([4ddffa1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/4ddffa110ffea4a26c036ad5039fa46ae7576c09))
+* **config:** publish aws-kit.sqs.consumer.queue_url in default config ([b3f01d7](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/b3f01d7800c56c6ab4683dba805897932111e21f))
+* patch release (0.4.1). ([b3f01d7](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/b3f01d7800c56c6ab4683dba805897932111e21f))
+
 ## [0.4.0](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.3.1...v0.4.0) (2026-06-12)
 
 
