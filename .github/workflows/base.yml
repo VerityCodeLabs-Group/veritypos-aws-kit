@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  workflow_call:
+
+jobs:
+  checks:
+    name: Lint & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, xml, ctype, json, curl, dom
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+
+      - run: composer test:lint
+
+      - run: composer test:stan

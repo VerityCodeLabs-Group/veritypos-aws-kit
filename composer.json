@@ -1,0 +1,62 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "veritypos/aws-kit",
+    "description": "VerityPOS AWS Kit for PHP — EventBridge publishers/consumers, SQS workers, Lambda handlers, and other AWS integration patterns. Reusable building blocks for VerityPOS microservices running on Fargate, ECS, Lambda, and LocalStack.",
+    "type": "library",
+    "version": "0.1.0",
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "aws/aws-sdk-php": "^3.0",
+        "bref/bref": "^3.0",
+        "illuminate/console": "^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "veritypos/contracts": "^v6.9.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.24",
+        "orchestra/testbench": "^10.0|^11.0",
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "VerityPOS\\AwsKit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "VerityPOS\\AwsKit\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": [
+            "@test:lint",
+            "@test:stan",
+            "@test:unit"
+        ],
+        "test:lint": "pint --test",
+        "test:lint:fix": "pint",
+        "test:stan": "phpstan analyse --memory-limit=512M",
+        "test:unit": "pest"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "VerityPOS\\AwsKit\\Providers\\AwsKitServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
