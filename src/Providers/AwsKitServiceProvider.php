@@ -6,6 +6,7 @@ namespace VerityPOS\AwsKit\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use VerityPOS\AwsKit\Console\EventBridgeInvokeCommand;
+use VerityPOS\AwsKit\Console\SqsConsumeCommand;
 use VerityPOS\AwsKit\Contracts\Dispatcher;
 use VerityPOS\AwsKit\Dispatcher\NullDispatcher;
 use VerityPOS\AwsKit\EventBridge\EventBridgePublisher;
@@ -41,6 +42,7 @@ final class AwsKitServiceProvider extends ServiceProvider
 
         $this->commands([
             EventBridgeInvokeCommand::class,
+            SqsConsumeCommand::class,
         ]);
     }
 
