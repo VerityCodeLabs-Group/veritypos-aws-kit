@@ -42,8 +42,9 @@ final class EventBridgeInvokeCommand extends Command
 
     public function handle(): int
     {
-        $envelope = $this->option('event-file') !== null
-            ? $this->resolveFromFile((string) $this->option('event-file'))
+        $eventFile = $this->option('event-file');
+        $envelope = is_string($eventFile) && $eventFile !== ''
+            ? $this->resolveFromFile($eventFile)
             : $this->resolveFromOptions();
 
         if ($envelope === null) {
@@ -104,11 +105,12 @@ final class EventBridgeInvokeCommand extends Command
         }
 
         $payload = $this->resolvePayload();
+        $source = $this->option('source');
 
         return [
             'version' => '0',
             'id' => (string) Str::uuid(),
-            'source' => 'veritypos.'.(string) $this->option('source'),
+            'source' => 'veritypos.'.(is_string($source) ? $source : 'unknown'),
             'detail-type' => $eventType,
             'account' => '000000000000',
             'time' => now()->toISOString(),
@@ -124,7 +126,7 @@ final class EventBridgeInvokeCommand extends Command
     private function resolvePayload(): array
     {
         $payloadOption = $this->option('payload');
-        if ($payloadOption === null) {
+        if (! is_string($payloadOption) || $payloadOption === '') {
             return [];
         }
 

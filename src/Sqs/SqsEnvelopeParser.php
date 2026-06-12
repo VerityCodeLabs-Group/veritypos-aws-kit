@@ -68,8 +68,8 @@ final class SqsEnvelopeParser
         // Preferred: message attribute (cheap to access, doesn't require
         // parsing the body)
         $attr = $attributes['event_type'] ?? null;
-        if (is_array($attr) && isset($attr['StringValue'])) {
-            return (string) $attr['StringValue'];
+        if (is_array($attr)) {
+            return $attr['StringValue'];
         }
 
         // Fallback: detail-type field in the body (parity with EventBridge)

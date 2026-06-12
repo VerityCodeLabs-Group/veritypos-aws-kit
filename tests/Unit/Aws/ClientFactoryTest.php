@@ -7,10 +7,10 @@ use VerityPOS\AwsKit\Aws\ClientFactory;
 
 it('builds a client for an arbitrary AWS service', function (): void {
     $factory = new ClientFactory;
-    $client = $factory->build('s3', 'us-west-2');
+    $client = $factory->build('sns', 'us-west-2');
 
     expect($client->getRegion())->toBe('us-west-2')
-        ->and($client->getApi()->getServiceFullName())->toBe('s3');
+        ->and($client->getApi()->getServiceName())->toBe('sns');
 });
 
 it('uses the default region when none is provided', function (): void {
