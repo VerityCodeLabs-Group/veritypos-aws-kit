@@ -14,7 +14,7 @@ namespace VerityPOS\AwsKit\Sqs;
 final class ConsumerConfig
 {
     public function __construct(
-        public readonly string $queueUrl,
+        public readonly string $queueUrl = '',
         public readonly int $maxMessages = 10,
         public readonly int $waitTimeSeconds = 20,
         public readonly int $visibilityTimeout = 30,
