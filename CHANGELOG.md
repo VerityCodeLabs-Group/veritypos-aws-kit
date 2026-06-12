@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.3.1...v0.4.0) (2026-06-12)
+
+
+### Features
+
+* **consumer:** make SqsConsumeCommand config-driven + fix eager-construction ([57ccf57](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/57ccf57555ba8d32f35f3ca0459c3c9ddcc2077f))
+* **consumer:** make SqsConsumeCommand config-driven + fix eager-construction ([618d57c](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/618d57caa82c1ef7dd008833b442e7f85a98f0bd))
+
+
+### Bug Fixes
+
+* **ci:** name the pull-request jobs 'CI' and 'Tests' ([42d41c1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/42d41c1ef935b6b9fd6397504cda3680a961a3be))
+* **ci:** name the pull-request jobs 'CI' and 'Tests' ([f52433f](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/f52433fa1d718dbb7e5dae05ecb86e79c627d9f8))
+
 ## [0.3.1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.3.0...v0.3.1) (2026-06-12)
 
 
