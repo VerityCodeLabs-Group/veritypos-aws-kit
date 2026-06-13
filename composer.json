@@ -3,7 +3,7 @@
     "name": "veritypos/aws-kit",
     "description": "VerityPOS AWS Kit for PHP — EventBridge publishers/consumers, SQS workers, Lambda handlers, and other AWS integration patterns. Reusable building blocks for VerityPOS microservices running on Fargate, ECS, Lambda, and LocalStack.",
     "type": "library",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "license": "MIT",
     "require": {
         "php": "^8.5",
