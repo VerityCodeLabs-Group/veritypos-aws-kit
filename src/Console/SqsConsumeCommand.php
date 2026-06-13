@@ -83,18 +83,25 @@ final class SqsConsumeCommand extends Command
         $this->info("Consuming from {$config->queueUrl}");
         $this->info("  max-messages={$config->maxMessages} wait={$config->waitTimeSeconds}s visibility={$config->visibilityTimeout}s");
 
-        $this->consumer->registerSignalHandlers();
+        // Apply the resolved config to the consumer. The Consumer
+        // instance was injected by Laravel with a default empty
+        // ConsumerConfig (queueUrl=''), so we need to swap in the
+        // real one. withConfig() returns a fresh consumer bound
+        // to the new config, preserving the SqsClient cache if any.
+        $consumer = $this->consumer->withConfig($config);
+
+        $consumer->registerSignalHandlers();
 
         // --once runs a single poll, then exits. Used by tests and
         // for one-shot debugging sessions. The full supervisord path
         // runs without --once (long-lived).
         if ($this->option('once')) {
-            $this->consumer->consumeOnce(fn (Envelope $envelope) => $this->dispatch($envelope));
+            $consumer->consumeOnce(fn (Envelope $envelope) => $this->dispatch($envelope));
 
             return self::SUCCESS;
         }
 
-        $this->consumer->consume(fn (Envelope $envelope) => $this->dispatch($envelope));
+        $consumer->consume(fn (Envelope $envelope) => $this->dispatch($envelope));
 
         return self::SUCCESS;
     }

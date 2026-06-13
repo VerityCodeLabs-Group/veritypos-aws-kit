@@ -32,14 +32,36 @@ final class Consumer implements ConsumerContract
 
     private bool $shouldStop = false;
 
+    private ConsumerConfig $config;
+
     public function __construct(
         private readonly SqsClientFactory $clientFactory,
-        private readonly ConsumerConfig $config,
-    ) {}
+        ConsumerConfig $config,
+    ) {
+        $this->config = $config;
+    }
 
     public function isConfigured(): bool
     {
         return $this->config->queueUrl !== '';
+    }
+
+    /**
+     * Return a new Consumer bound to the given config. Used by the
+     * SqsConsumeCommand so the queue URL resolved from CLI/env flows
+     * into the runtime consumer. A fresh consumer is returned (the
+     * current instance is immutable for config) so signal handlers,
+     * the SqsClient cache, and the in-flight shouldStop flag are
+     * scoped to the new instance.
+     */
+    public function withConfig(ConsumerConfig $config): self
+    {
+        $clone = new self($this->clientFactory, $config);
+        if ($this->client instanceof SqsClient) {
+            $clone->client = $this->client;
+        }
+
+        return $clone;
     }
 
     /**
