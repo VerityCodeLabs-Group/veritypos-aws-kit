@@ -90,7 +90,9 @@ it('can be constructed without runtime config (artisan-list safe)', function ():
 it('reads the queue URL from config(\'aws-kit.sqs.consumer.queue_url\') when --queue is omitted', function (): void {
     // The queue URL is read from config('aws-kit.sqs.consumer.queue_url')
     // when --queue is omitted. Assert the URL flows through to the
-    // SQS receiveMessage call.
+    // SQS receiveMessage call. The Consumer is injected with a
+    // default (empty) config; the command should apply the resolved
+    // config via withConfig() so the SQS call gets the right URL.
     config()->set('aws-kit.sqs.consumer.queue_url', 'https://sqs.example.com/from-config');
 
     $sqsClient = Mockery::mock(SqsClient::class);
@@ -105,7 +107,7 @@ it('reads the queue URL from config(\'aws-kit.sqs.consumer.queue_url\') when --q
 
     $consumer = new Consumer(
         clientFactory: new SqsClientFactory,
-        config: new ConsumerConfig(queueUrl: 'https://sqs.example.com/from-config'),
+        config: new ConsumerConfig,
     );
 
     // Inject the mocked SqsClient directly into the Consumer's
@@ -145,7 +147,7 @@ it('--queue takes precedence over the config value when both are provided', func
 
     $consumer = new Consumer(
         clientFactory: new SqsClientFactory,
-        config: new ConsumerConfig(queueUrl: 'https://sqs.example.com/from-cli'),
+        config: new ConsumerConfig,
     );
 
     $reflection = new ReflectionProperty($consumer, 'client');
@@ -164,6 +166,27 @@ it('--queue takes precedence over the config value when both are provided', func
 
     expect($tester->getStatusCode())->toBe(0);
 });
+
+it('throws when neither --queue nor config is provided', function (): void {
+    // Defensive: an empty queue URL should fail loudly at the command
+    // boundary, not silently fall through to a default-empty Consumer.
+    config()->set('aws-kit.sqs.consumer.queue_url', null);
+
+    $consumer = new Consumer(
+        clientFactory: new SqsClientFactory,
+        config: new ConsumerConfig,
+    );
+    $dispatcher = new class implements Dispatcher
+    {
+        public function dispatch(string $eventType, array $payload): void {}
+    };
+
+    $command = new SqsConsumeCommand($consumer, $dispatcher);
+    $command->setLaravel($this->app);
+
+    $tester = new CommandTester($command);
+    $tester->execute(['--once' => true]);
+})->throws(RuntimeException::class, 'SQS queue URL is not configured');
 
 it('dispatches the unwrapped envelope to the consumer service dispatcher', function (): void {
     $envelope = new class implements Envelope
