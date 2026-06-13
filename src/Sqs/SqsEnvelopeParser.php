@@ -30,9 +30,16 @@ final class SqsEnvelopeParser
             throw new \InvalidArgumentException('SQS message Body must be a string');
         }
 
-        $payload = $body === '' ? [] : $this->decodeBody($body);
+        $rawPayload = $body === '' ? [] : $this->decodeBody($body);
 
-        $eventType = $this->extractEventType($payload, $attributes);
+        // Extract the event type from the raw body first (EventBridge
+        // puts `detail-type` at the envelope's top level, not under
+        // `detail`), then unwrap the EventBridge envelope so the
+        // dispatched payload is the domain payload, not the AWS
+        // wrapper.
+        $eventType = $this->extractEventType($rawPayload, $attributes);
+
+        $payload = $this->unwrapEventBridgeEnvelope($rawPayload);
 
         return new SqsEnvelope(
             source: $source,
@@ -42,6 +49,42 @@ final class SqsEnvelopeParser
             messageId: isset($rawMessage['MessageId']) ? (string) $rawMessage['MessageId'] : null,
             receiptHandle: isset($rawMessage['ReceiptHandle']) ? (string) $rawMessage['ReceiptHandle'] : null,
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $rawPayload
+     * @return array<string, mixed>
+     */
+    private function unwrapEventBridgeEnvelope(array $rawPayload): array
+    {
+        if (! $this->looksLikeEventBridgeEnvelope($rawPayload)) {
+            return $rawPayload;
+        }
+
+        // When the SQS queue is fed by EventBridge (the standard
+        // VerityPOS pattern: EventBridge rule → SQS target), the body
+        // is the full EventBridge envelope. The actual domain payload
+        // lives under `detail`. Without unwrapping, downstream
+        // consumers see the EventBridge wrapper as their payload and
+        // can't find domain fields like `aggregate_id` at the top
+        // level. The kit's runtime-agnostic contract is that the
+        // dispatched payload is the *domain* payload, so we unwrap
+        // here.
+        return is_array($rawPayload['detail'] ?? null) ? $rawPayload['detail'] : [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function looksLikeEventBridgeEnvelope(array $payload): bool
+    {
+        // EventBridge envelopes always have version="0", detail-type,
+        // and a detail object. Match on the three required fields to
+        // avoid misidentifying a domain payload that happens to have
+        // a "detail" key.
+        return ($payload['version'] ?? null) === '0'
+            && is_string($payload['detail-type'] ?? null)
+            && array_key_exists('detail', $payload);
     }
 
     /**

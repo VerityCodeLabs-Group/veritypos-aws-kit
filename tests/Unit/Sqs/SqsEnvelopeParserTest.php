@@ -81,3 +81,88 @@ it('rejects a message without event_type anywhere', function (): void {
         'MessageAttributes' => [],
     ], 'queue-url');
 })->throws(InvalidArgumentException::class, 'SQS message missing event_type attribute');
+
+it('unwraps an EventBridge envelope and exposes detail as the payload', function (): void {
+    // EventBridge → SQS delivers the full EventBridge envelope in the
+    // SQS body. The kit's runtime-agnostic contract is that the
+    // dispatched payload is the *domain* payload, so the parser
+    // unwraps the envelope. Without this, downstream consumers see
+    // the EventBridge wrapper (version, id, account, ...) as their
+    // payload and domain fields like `aggregate_id` are buried under
+    // `detail`.
+    $parser = new SqsEnvelopeParser;
+    $envelope = $parser->parse([
+        'MessageId' => 'msg-eb',
+        'Body' => json_encode([
+            'version' => '0',
+            'id' => 'evt-1',
+            'detail-type' => 'user.created',
+            'source' => 'veritypos.auth',
+            'account' => '123456789012',
+            'time' => '2026-06-13T01:00:00Z',
+            'region' => 'ap-southeast-1',
+            'resources' => [],
+            'detail' => [
+                'aggregate_type' => 'user',
+                'aggregate_id' => 'u-1',
+                'source' => 'auth',
+                'id' => 'u-1',
+                'name' => 'Alice',
+            ],
+        ]),
+        'MessageAttributes' => [
+            'event_type' => ['DataType' => 'String', 'StringValue' => 'user.created'],
+        ],
+    ], 'queue-url');
+
+    // The dispatched payload is the domain detail, not the wrapper.
+    expect($envelope->payload())->toBe([
+        'aggregate_type' => 'user',
+        'aggregate_id' => 'u-1',
+        'source' => 'auth',
+        'id' => 'u-1',
+        'name' => 'Alice',
+    ])->and($envelope->eventType())->toBe('user.created');
+});
+
+it('reads event_type from the EventBridge envelope detail-type when no message attribute is set', function (): void {
+    // Some EventBridge → SQS configurations don't set the event_type
+    // message attribute (the kit's EventBridge publisher does, but
+    // other publishers may not). The parser should still find the
+    // event type from the envelope's detail-type field.
+    $parser = new SqsEnvelopeParser;
+    $envelope = $parser->parse([
+        'Body' => json_encode([
+            'version' => '0',
+            'detail-type' => 'user.created',
+            'source' => 'veritypos.auth',
+            'detail' => ['aggregate_id' => 'u-2'],
+        ]),
+        'MessageAttributes' => [],
+    ], 'queue-url');
+
+    expect($envelope->eventType())->toBe('user.created')
+        ->and($envelope->payload())->toBe(['aggregate_id' => 'u-2']);
+});
+
+it('does not unwrap payloads that merely contain a detail key', function (): void {
+    // Defensive: avoid misidentifying a domain payload that happens
+    // to have a "detail" key. The unwrap requires version="0" AND
+    // a string detail-type AND a detail field — all three.
+    $parser = new SqsEnvelopeParser;
+    $envelope = $parser->parse([
+        'Body' => json_encode([
+            'detail' => ['note' => 'something'],
+            'id' => '1',
+        ]),
+        'MessageAttributes' => [
+            'event_type' => ['DataType' => 'String', 'StringValue' => 'custom.event'],
+        ],
+    ], 'queue-url');
+
+    // Payload is NOT unwrapped (no version="0" / detail-type).
+    expect($envelope->payload())->toBe([
+        'detail' => ['note' => 'something'],
+        'id' => '1',
+    ])->and($envelope->eventType())->toBe('custom.event');
+});
