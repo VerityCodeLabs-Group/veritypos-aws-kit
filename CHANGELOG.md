@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.3](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.2...v0.4.3) (2026-06-13)
+
+
+### Bug Fixes
+
+* **sqs:** unwrap EventBridge envelope before dispatching ([3074f40](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/3074f4019c3b4a75c7be3ca1c9a8ad20da1cb882))
+
+
+### Miscellaneous Chores
+
+* bump kit version to 0.5.0 ([3f8259b](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/3f8259bca5f7800cbd9cc3454c10dcd77a39ef96))
+* **main:** release 0.5.0 — EventBridge envelope unwrap fix ([3fa77d6](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/3fa77d613f1da96ef74c2102661f1ad38515e26d))
+
 ## [0.4.2](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.1...v0.4.2) (2026-06-13)
 
 
