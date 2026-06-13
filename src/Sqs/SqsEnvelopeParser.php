@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VerityPOS\AwsKit\Sqs;
 
 use VerityPOS\AwsKit\Contracts\Envelope;
+use VerityPOS\AwsKit\Contracts\EnvelopeParser;
 
 /**
  * Unwraps a raw SQS message array into an Envelope.
@@ -14,8 +15,15 @@ use VerityPOS\AwsKit\Contracts\Envelope;
  * — see the `veritypos-aws-kit` config docs) with a fallback to a
  * `detail-type` field in the body for parity with the EventBridge
  * envelope shape.
+ *
+ * This is the **default** parser (the kit's built-in
+ * `Contracts\EnvelopeParser` implementation). It assumes a single
+ * event per SQS message. For multi-event batched envelopes
+ * (commerce's `SyncMessageData` device-bus messages), implement
+ * `Contracts\EnvelopeParser` and declare the parser class on the
+ * corresponding `QueueBinding`.
  */
-final class SqsEnvelopeParser
+final class SqsEnvelopeParser implements EnvelopeParser
 {
     /**
      * @param  array<string, mixed>  $rawMessage  the full SQS message array

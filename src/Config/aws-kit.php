@@ -15,15 +15,17 @@ return [
     'eventbridge' => [
         'event_bus_name' => env('EVENTBRIDGE_BUS_NAME', 'veritypos-domain-events'),
         'source_prefix' => env('EVENTBRIDGE_SOURCE_PREFIX', 'veritypos'),
-        'region' => env('AWS_REGION', 'ap-southeast-1'),
+        'region' => env('EVENTBRIDGE_REGION', 'ap-southeast-1'),
         'endpoint' => env('EVENTBRIDGE_ENDPOINT'),
     ],
 
     'sqs' => [
+        // Default single-consumer config (v0.4.x style, kept for
+        // backward compat). New code should register named bindings
+        // via QueueBindingRegistry from a service provider. The
+        // SqsConsumeCommand auto-picks the binding (single-binding
+        // case) or requires --binding=NAME (multi-binding case).
         'consumer' => [
-            // Queue URL for the aws-kit:sqs-consume command. Read by
-            // default; --queue= on the CLI overrides this. Set in the
-            // consumer service's published config/aws-kit.php.
             'queue_url' => env('AWS_KIT_SQS_CONSUMER_QUEUE_URL'),
         ],
     ],

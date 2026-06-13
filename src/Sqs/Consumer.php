@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use VerityPOS\AwsKit\Contracts\Consumer as ConsumerContract;
 use VerityPOS\AwsKit\Contracts\Envelope;
+use VerityPOS\AwsKit\Contracts\EnvelopeParser;
 
 /**
  * Long-poll SQS consumer.
@@ -68,8 +69,11 @@ final class Consumer implements ConsumerContract
      * Block and consume messages.
      *
      * @param  callable(Envelope): void  $handler
+     * @param  EnvelopeParser|null  $parser  Per-binding envelope parser. Defaults
+     *                                       to the kit's `SqsEnvelopeParser`
+     *                                       (EventBridge-fed single-event shape).
      */
-    public function consume(callable $handler): void
+    public function consume(callable $handler, ?EnvelopeParser $parser = null): void
     {
         if (! $this->isConfigured()) {
             throw new \LogicException('Consumer is not configured (queueUrl is empty)');
@@ -77,8 +81,10 @@ final class Consumer implements ConsumerContract
 
         $this->shouldStop = false;
 
+        $parser ??= new SqsEnvelopeParser;
+
         do {
-            $this->pollOnce($handler);
+            $this->pollOnce($handler, $parser);
         } while (! $this->shouldStop);
     }
 
@@ -87,14 +93,17 @@ final class Consumer implements ConsumerContract
      * the SqsConsumeCommand for tests + one-shot debugging.
      *
      * @param  callable(Envelope): void  $handler
+     * @param  EnvelopeParser|null  $parser  Per-binding envelope parser. See consume().
      */
-    public function consumeOnce(callable $handler): void
+    public function consumeOnce(callable $handler, ?EnvelopeParser $parser = null): void
     {
         if (! $this->isConfigured()) {
             throw new \LogicException('Consumer is not configured (queueUrl is empty)');
         }
 
-        $this->pollOnce($handler);
+        $parser ??= new SqsEnvelopeParser;
+
+        $this->pollOnce($handler, $parser);
     }
 
     public function stop(): void
@@ -123,7 +132,7 @@ final class Consumer implements ConsumerContract
     /**
      * @param  callable(Envelope): void  $handler
      */
-    private function pollOnce(callable $handler): void
+    private function pollOnce(callable $handler, EnvelopeParser $parser): void
     {
         $result = $this->getClient()->receiveMessage([
             'QueueUrl' => $this->config->queueUrl,
@@ -137,7 +146,7 @@ final class Consumer implements ConsumerContract
         $messages = $result->get('Messages') ?? [];
 
         foreach ($messages as $message) {
-            $this->processMessage($message, $handler);
+            $this->processMessage($message, $handler, $parser);
         }
 
         if ($messages === []) {
@@ -152,9 +161,8 @@ final class Consumer implements ConsumerContract
      * @param  array<string, mixed>  $message
      * @param  callable(Envelope): void  $handler
      */
-    private function processMessage(array $message, callable $handler): void
+    private function processMessage(array $message, callable $handler, EnvelopeParser $parser): void
     {
-        $parser = new SqsEnvelopeParser;
         $messageId = (string) ($message['MessageId'] ?? 'unknown');
 
         try {
