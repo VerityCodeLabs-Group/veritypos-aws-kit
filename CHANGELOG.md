@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.3...v0.5.0) (2026-06-13)
+
+
+### Features
+
+* **sqs:** add named QueueBinding/SqsPublisherBinding registries ([82bcea2](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/82bcea29a79cf93539d8a91877afe090595a5b52))
+
 ## [0.4.3](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.2...v0.4.3) (2026-06-13)
 
 
