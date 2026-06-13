@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.2](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.1...v0.4.2) (2026-06-13)
+
+
+### Bug Fixes
+
+* **sqs:** apply resolved config to consumer at handle() time ([397b2d5](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/397b2d5cc8976e8fc0d3433a724788218c1965f7))
+* **sqs:** apply resolved config to consumer at handle() time ([c6ee634](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/commit/c6ee6341d4d179919f634271f19aa709b2974f21))
+
 ## [0.4.1](https://github.com/VerityCodeLabs-Group/veritypos-aws-kit/compare/v0.4.0...v0.4.1) (2026-06-12)
 
 
