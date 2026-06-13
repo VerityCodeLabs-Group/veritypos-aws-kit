@@ -96,6 +96,7 @@ src/
 │
 ├── Contracts/                           # Runtime-agnostic interfaces
 │   ├── Envelope.php                     # source / eventType / payload
+│   ├── EnvelopeParser.php               # raw SQS message → Envelope (v0.5+)
 │   ├── Handler.php                      # handle(string $type, array $payload)
 │   ├── Dispatcher.php                  # dispatch(string $type, array $payload)
 │   └── Consumer.php                     # consume(callable $handler)
@@ -111,11 +112,16 @@ src/
 │   └── Runtime/
 │       └── EventBridgeLambdaHandler.php # Bref Lambda adapter
 │
-├── Sqs/
+├── Sqs/                                 # SQS transport + binding-driven consumer
 │   ├── SqsClientFactory.php             # SQS-specific client builder
 │   ├── SqsPublisher.php                 # sendMessage + sendMessageBatch
+│   ├── SqsPublisherBinding.php          # Named publisher config (v0.5+)
+│   ├── SqsPublisherRegistry.php         # name => SqsPublisherBinding (v0.5+)
+│   ├── SqsPublisherFactory.php          # builds SqsPublisher from binding, cached (v0.5+)
 │   ├── SqsEnvelope.php                 # Unwrapped SQS body + attributes
-│   ├── SqsEnvelopeParser.php            # SQS message → Envelope
+│   ├── SqsEnvelopeParser.php            # SQS message → Envelope (default impl)
+│   ├── QueueBinding.php                 # Named consumer config (v0.5+)
+│   ├── QueueBindingRegistry.php         # name => QueueBinding (v0.5+)
 │   ├── ConsumerConfig.php               # Immutable DTO
 │   └── Consumer.php                     # Long-poll SQS worker (Fargate runtime)
 │
@@ -147,5 +153,9 @@ $this->app->singleton(Dispatcher::class, function () {
 ```
 
 The runtime adapter (Lambda or SQS worker) calls `Dispatcher::dispatch()` and the right handler fires. The service doesn't know — and doesn't need to know — which runtime triggered the call.
+
+### Multiple SQS topologies per service (v0.5+)
+
+A single service can consume from N queues with different envelope shapes and different routing strategies. Each queue is declared as a `QueueBinding` in a service provider, and supervisord runs one `aws-kit:sqs-consume --binding=NAME` process per binding. See [docs/api/sqs-bindings.md](api/sqs-bindings.md) for the full pattern, including how commerce-service runs two consumers (one for inter-service EventBridge-fed SQS, one for sync-engine-fed device-bus SQS) in the same Fargate task.
 
 See [docs/api/installation.md](api/installation.md) for the full setup.
